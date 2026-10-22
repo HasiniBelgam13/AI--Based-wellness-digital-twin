@@ -45,9 +45,11 @@ export default function DailyCheckInPage({
   const [successInfo, setSuccessInfo] = useState(null);
   const [validationError, setValidationError] = useState('');
   const [isUpdateConfirmationOpen, setIsUpdateConfirmationOpen] = useState(false);
+  const checkInForSelectedDate = checkIns.find((entry) => entry.date === date);
+  const hasCheckedInToday = date === today && Boolean(checkInForSelectedDate);
 
   useEffect(() => {
-    const existing = checkIns.find((c) => c.date === date);
+    const existing = checkInForSelectedDate;
     if (existing) {
       setSleepHours(existing.Sleep_Duration);
       setDailySteps(existing.Daily_Steps);
@@ -67,7 +69,7 @@ export default function DailyCheckInPage({
       setSelectedMood(null);
       setHeartRate('');
     }
-  }, [date, checkIns]);
+  }, [date, checkInForSelectedDate]);
 
   const handleMoodSelect = (mood) => {
     setSelectedMood(mood.id);
@@ -86,12 +88,16 @@ export default function DailyCheckInPage({
     setSaving(true);
 
     try {
+      const duration = Number(sleepHours);
+      const steps = Number(dailySteps);
+      const activity = Number(activityTime);
+
       const entryDraft = {
         date,
-        Sleep_Duration: dur,
+        Sleep_Duration: duration,
         Quality_of_Sleep: selectedMood === 'great' ? 9 : selectedMood === 'good' ? 8 : selectedMood === 'okay' ? 6 : 4,
         Stress_Level: Number(stressLevel),
-        Physical_Activity_Level: act,
+        Physical_Activity_Level: activity,
         Daily_Steps: steps,
         Heart_Rate: Number(heartRate),
         Blood_Pressure: userProfile?.bloodPressure || '120/80',
@@ -159,6 +165,25 @@ export default function DailyCheckInPage({
 
   return (
     <div style={{ maxWidth: 1040, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 20 }}>
+      {hasCheckedInToday && (
+        <div
+          role="status"
+          style={{
+            backgroundColor: '#ECFDF5',
+            border: '1px solid #A7F3D0',
+            borderRadius: '16px',
+            padding: '14px 20px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            color: '#047857'
+          }}
+        >
+          <CheckCircle2 size={20} />
+          <span><strong>Today's check-in is complete.</strong> Your saved values are shown below.</span>
+        </div>
+      )}
+
       {/* Success Notification */}
       {successInfo && (
         <div
@@ -193,7 +218,7 @@ export default function DailyCheckInPage({
                 Check-in Saved Successfully!
               </h4>
               <p style={{ fontSize: 13, color: '#047857' }}>
-                Overall Score: <strong>{successInfo.overallScore} / 100</strong> ({successInfo.statusLabel}) • ML State: <strong>{successInfo.wellnessState}</strong>
+                Overall Score: <strong>{successInfo.overallScore} / 100</strong> ({successInfo.statusLabel}) • Wellness state: <strong>{successInfo.wellnessState}</strong>
               </p>
             </div>
           </div>

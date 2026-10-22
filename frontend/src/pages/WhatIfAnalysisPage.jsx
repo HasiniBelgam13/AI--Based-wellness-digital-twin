@@ -206,7 +206,7 @@ export default function WhatIfAnalysisPage({
                 Adjust Hypothetical Measurements
               </h4>
               <span style={{ fontSize: 12, color: 'var(--wn-text-muted)' }}>
-                Drag sliders to observe immediate score & ML state shifts
+                Drag sliders to see how your score and wellness state change
               </span>
             </div>
           </div>

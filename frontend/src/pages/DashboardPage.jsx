@@ -3,6 +3,7 @@ import {
   Activity,
   ArrowRight,
   CalendarDays,
+  CheckCircle2,
   ChevronRight,
   Clock3,
   Footprints,
@@ -12,7 +13,7 @@ import {
   Star,
   Zap
 } from 'lucide-react';
-import { formatFullDate } from '../utils/dateUtils';
+import { formatFullDate, getTodayDateInputValue } from '../utils/dateUtils';
 import { getScoreColor, getScoreStatusLabel } from '../utils/scoreCalculator';
 
 function ProgressRow({ icon: Icon, label, current, goal, unit, color, percent }) {
@@ -37,6 +38,7 @@ function ProgressRow({ icon: Icon, label, current, goal, unit, color, percent })
 
 export default function DashboardPage({ userProfile, checkIns, onNavigate, onOpenGoals }) {
   const latestCheckIn = checkIns?.[0];
+  const hasCheckedInToday = checkIns?.some((entry) => entry.date === getTodayDateInputValue()) ?? false;
 
   if (!latestCheckIn) {
     return (
@@ -180,11 +182,17 @@ export default function DashboardPage({ userProfile, checkIns, onNavigate, onOpe
 
       <section className="dashboard-footer-strip">
         <div className="dashboard-footer-message">
-          <Moon size={18} />
-          <span>Rest well today. Give tomorrow your best.</span>
+          {hasCheckedInToday ? <CheckCircle2 size={18} /> : <Moon size={18} />}
+          <span>
+            {hasCheckedInToday
+              ? "Today's check-in is complete. You're all set for today."
+              : 'Rest well today. Give tomorrow your best.'}
+          </span>
         </div>
         <div className="dashboard-footer-actions">
-          <button onClick={() => onNavigate('checkin')} className="wn-btn wn-btn-primary">Complete check-in</button>
+          <button onClick={() => onNavigate('checkin')} className="wn-btn wn-btn-primary">
+            {hasCheckedInToday ? "View today's check-in" : 'Complete check-in'}
+          </button>
           <button onClick={() => onNavigate('whatif')} className="wn-btn wn-btn-outline">Explore What-If</button>
         </div>
       </section>

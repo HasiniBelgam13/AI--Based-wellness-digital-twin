@@ -169,7 +169,7 @@ export default function WellnessHistoryPage({
                   <th style={{ padding: '14px 16px' }}>Heart Rate</th>
                   <th style={{ padding: '14px 16px' }}>Score</th>
                   <th style={{ padding: '14px 16px' }}>Change</th>
-                  <th style={{ padding: '14px 16px' }}>ML State</th>
+                  <th style={{ padding: '14px 16px' }}>Wellness State</th>
                   <th style={{ padding: '14px 20px', textAlign: 'right' }}>Actions</th>
                 </tr>
               </thead>
