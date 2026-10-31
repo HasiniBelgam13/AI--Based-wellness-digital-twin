@@ -4,7 +4,9 @@
  * Includes graceful offline resilience with transparent heuristic classification fallback.
  */
 
-export const API_BASE_URL = "http://127.0.0.1:8000";
+export const API_BASE_URL = import.meta.env.PROD
+  ? "/api"
+  : "http://127.0.0.1:8000";
 
 /**
  * Checks if the backend FastAPI service is actively running and reachable.

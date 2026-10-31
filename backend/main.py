@@ -4,13 +4,22 @@ from fastapi.middleware.cors import CORSMiddleware
 import joblib
 import pandas as pd
 
-from backend.schemas import WellnessInput
-from backend.database import (
-    create_database,
-    save_prediction,
-    get_predictions
-)
-from backend.what_if import run_what_if
+try:
+    from backend.schemas import WellnessInput
+    from backend.database import (
+        create_database,
+        save_prediction,
+        get_predictions
+    )
+    from backend.what_if import run_what_if
+except ModuleNotFoundError:
+    from schemas import WellnessInput
+    from database import (
+        create_database,
+        save_prediction,
+        get_predictions
+    )
+    from what_if import run_what_if
 
 
 # ==========================================
@@ -58,6 +67,8 @@ create_database()
 # ==========================================
 
 @app.get("/")
+@app.get("/api")
+@app.get("/api/")
 def home():
 
     return {
@@ -65,12 +76,12 @@ def home():
         "status": "running"
     }
 
-
 # ==========================================
 # PREDICTION
 # ==========================================
 
 @app.post("/predict")
+@app.post("/api/predict")
 def predict(data: WellnessInput):
 
     try:
@@ -169,6 +180,7 @@ def predict(data: WellnessInput):
 # PREDICTION HISTORY
 # ==========================================
 @app.get("/history")
+@app.get("/api/history")
 def history(name: str = None):
 
     return {
@@ -180,6 +192,7 @@ def history(name: str = None):
 # ==========================================
 
 @app.post("/what-if")
+@app.post("/api/what-if")
 def what_if(
     current_data: WellnessInput,
     new_data: WellnessInput
