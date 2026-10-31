@@ -1,114 +1,57 @@
 import sqlite3
 import os
 
+# Vercel allows writing only to /tmp
+DATABASE_FOLDER = "/tmp/database"
+DATABASE_PATH = os.path.join(DATABASE_FOLDER, "wellness.db")
 
-# ==========================================
-# DATABASE PATH
-# ==========================================
+os.makedirs(DATABASE_FOLDER, exist_ok=True)
 
-DATABASE_FOLDER = "database"
-
-os.makedirs(
-    DATABASE_FOLDER,
-    exist_ok=True
-)
-
-DATABASE_PATH = os.path.join(
-    DATABASE_FOLDER,
-    "wellness.db"
-)
-
-
-# ==========================================
-# CREATE DATABASE
-# ==========================================
 
 def create_database():
-
-    connection = sqlite3.connect(
-        DATABASE_PATH
-    )
-
+    connection = sqlite3.connect(DATABASE_PATH)
     cursor = connection.cursor()
 
-    # Create table if it doesn't exist
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS predictions (
-
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-
             name TEXT,
-
             gender TEXT,
-
             age INTEGER,
-
             occupation TEXT,
-
             sleep_duration REAL,
-
             quality_of_sleep INTEGER,
-
             physical_activity_level INTEGER,
-
             stress_level INTEGER,
-
             bmi_category TEXT,
-
             blood_pressure TEXT,
-
             heart_rate INTEGER,
-
             daily_steps INTEGER,
-
             sleep_disorder TEXT,
-
             wellness_state TEXT,
-
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
 
-    # ------------------------------------------------
-    # Add name column to an OLD existing database
-    # ------------------------------------------------
-
-    cursor.execute("""
-        PRAGMA table_info(predictions)
-    """)
-
-    columns = [
-        row[1]
-        for row in cursor.fetchall()
-    ]
+    cursor.execute("PRAGMA table_info(predictions)")
+    columns = [row[1] for row in cursor.fetchall()]
 
     if "name" not in columns:
-
         cursor.execute("""
             ALTER TABLE predictions
             ADD COLUMN name TEXT
         """)
 
     connection.commit()
-
     connection.close()
 
 
-# ==========================================
-# SAVE PREDICTION
-# ==========================================
-
 def save_prediction(data, wellness_state):
-
-    connection = sqlite3.connect(
-        DATABASE_PATH
-    )
-
+    connection = sqlite3.connect(DATABASE_PATH)
     cursor = connection.cursor()
 
     cursor.execute("""
         INSERT INTO predictions (
-
             name,
             gender,
             age,
@@ -123,12 +66,9 @@ def save_prediction(data, wellness_state):
             daily_steps,
             sleep_disorder,
             wellness_state
-
         )
-
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
-
         data.Name,
         data.Gender,
         data.Age,
@@ -146,35 +86,22 @@ def save_prediction(data, wellness_state):
     ))
 
     connection.commit()
-
     connection.close()
 
 
-# ==========================================
-# GET USER HISTORY
-# ==========================================
-
 def get_predictions(name=None):
-
-    connection = sqlite3.connect(
-        DATABASE_PATH
-    )
-
+    connection = sqlite3.connect(DATABASE_PATH)
     connection.row_factory = sqlite3.Row
-
     cursor = connection.cursor()
 
     if name:
-
         cursor.execute("""
             SELECT *
             FROM predictions
             WHERE LOWER(name) = LOWER(?)
             ORDER BY id DESC
         """, (name,))
-
     else:
-
         cursor.execute("""
             SELECT *
             FROM predictions
@@ -182,10 +109,6 @@ def get_predictions(name=None):
         """)
 
     rows = cursor.fetchall()
-
     connection.close()
 
-    return [
-        dict(row)
-        for row in rows
-    ]
+    return [dict(row) for row in rows]
